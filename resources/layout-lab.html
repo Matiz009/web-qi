@@ -1,0 +1,701 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Layout Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: workbook — lesson tabs on top, controls column left, live stage + explain + code + tasks right; graph-paper stage */
+:root{
+  --paper:#eef1f4; --sheet:#ffffff; --ink:#17202a; --ink-2:#4c5a68; --line:#d3dae1; --grid:#e3e8ed;
+  --accent:#2d4cd2; --accent-ink:#ffffff; --accent-soft:#e2e7fb;
+  --c-content:#9cc3ec; --c-padding:#bcdca2; --c-border:#eec46c; --c-margin:#f5b08f;
+  --ok:#1d8a4b; --ok-soft:#dcf2e5; --warn:#b4341f;
+  --code-bg:#131a23; --code-fg:#d7e0ea; --code-prop:#8fb2ff; --code-val:#ffd58a; --code-hl:#24324c; --code-dim:#7d8a98;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0e1318; --sheet:#151c24; --ink:#e5eaef; --ink-2:#9aa7b4; --line:#2a3541; --grid:#1b232c;
+  --accent:#86a0ff; --accent-ink:#0b1020; --accent-soft:#1f2a4a;
+  --c-content:#3c6b98; --c-padding:#4d7a39; --c-border:#9c7b2a; --c-margin:#9c5a3d;
+  --ok:#52c985; --ok-soft:#173826; --warn:#ff8a73;
+  --code-bg:#0a0e13; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0e1318; --sheet:#151c24; --ink:#e5eaef; --ink-2:#9aa7b4; --line:#2a3541; --grid:#1b232c;
+  --accent:#86a0ff; --accent-ink:#0b1020; --accent-soft:#1f2a4a;
+  --c-content:#3c6b98; --c-padding:#4d7a39; --c-border:#9c7b2a; --c-margin:#9c5a3d;
+  --ok:#52c985; --ok-soft:#173826; --warn:#ff8a73;
+  --code-bg:#0a0e13; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+.brand h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.02em}
+.brand p{margin:4px 0 0;color:var(--ink-2)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{display:flex;align-items:baseline;gap:8px;padding:9px 14px;border:1px solid var(--line);background:var(--sheet);border-radius:8px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.tab small{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);letter-spacing:.04em}
+.tab b{font-family:var(--f-display);font-weight:700}
+.tab[aria-current="page"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tab[aria-current="page"] small{color:inherit;opacity:.7}
+
+.intro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:start}
+.intro h2{font-size:clamp(24px,3vw,32px);font-weight:700;margin-bottom:6px}
+.intro p{margin:0;max-width:65ch;color:var(--ink-2)}
+.key{border-left:3px solid var(--accent);padding:10px 14px;background:var(--sheet);border-radius:0 8px 8px 0}
+.key .lbl{margin-bottom:4px}
+.key p{color:var(--ink)}
+
+.lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.work{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel h3{font-size:16px;font-weight:700}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:13px}
+.ghost:hover{border-color:var(--ink-2)}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.ctl label,.ctl .cname{display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:13px;font-weight:600}
+.ctl output{color:var(--accent);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=text]{width:100%;font-family:var(--f-mono);font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+input[type=text][aria-invalid="true"]{border-color:var(--warn)}
+.err{color:var(--warn);font-size:12px;min-height:0}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-family:var(--f-mono);font-size:12px;padding:5px 8px;border-radius:5px;border:1px solid var(--line);background:var(--paper);cursor:pointer;line-height:1.2}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+.divider{border:0;border-top:1px dashed var(--line);margin:0}
+.sel-note{font-size:13px;color:var(--ink-2);margin:0}
+
+.right{display:flex;flex-direction:column;gap:16px;min-width:0}
+.stage{background-color:var(--sheet);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:10px 10px;border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto;position:relative}
+.stage-label{position:absolute;top:8px;right:12px;font-family:var(--f-mono);font-size:11px;color:var(--ink-2);background:var(--sheet);padding:2px 6px;border-radius:4px}
+
+/* explain + code */
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.explain p{margin:0}
+.explain code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+.codebox{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:14px 0 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.codebox .bar{display:flex;justify-content:space-between;align-items:center;padding:0 14px}
+.codebox .lbl{color:var(--code-dim)}
+.copy{background:transparent;border:1px solid #3a4656;color:var(--code-fg);border-radius:5px;font-size:12px;padding:3px 9px;cursor:pointer}
+pre.css{margin:0;font-family:var(--f-mono);font-size:13px;line-height:1.6;overflow-x:auto;padding:0}
+pre.css span.ln{display:block;padding:0 14px}
+pre.css span.ln.hl{background:var(--code-hl);box-shadow:inset 3px 0 0 var(--code-val)}
+.p{color:var(--code-prop)} .v{color:var(--code-val)} .s{color:var(--code-fg)} .c{color:var(--code-dim)}
+
+.tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:t}
+.tasks li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:8px;counter-increment:t}
+.tasks li::before{content:counter(t);font-family:var(--f-mono);font-size:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--paper);color:var(--ink-2)}
+.tasks li.done{background:var(--ok-soft);border-color:transparent}
+.tasks li.done::before{content:"✓";background:var(--ok);color:var(--sheet)}
+.pill{font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.done .pill{border-color:var(--ok);color:var(--ok)}
+.score{font-family:var(--f-mono);font-size:12px;color:var(--ink-2)}
+
+/* BOX MODEL */
+.bm-inner{position:relative;min-width:720px;padding-top:30px}
+.ruler{position:absolute;top:0;left:0;right:0;height:22px;border-bottom:1px solid var(--ink-2);
+  background-image:repeating-linear-gradient(90deg,var(--ink-2) 0 1px,transparent 1px 10px),repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 50px);
+  background-size:100% 6px,100% 12px;background-position:0 100%,0 100%;background-repeat:no-repeat}
+.ruler span{position:absolute;top:0;font-family:var(--f-mono);font-size:10px;color:var(--ink-2);transform:translateX(3px)}
+.bm-margin{display:inline-block;vertical-align:top;background:repeating-linear-gradient(-45deg,var(--c-margin) 0 6px,color-mix(in srgb,var(--c-margin) 45%,transparent) 6px 12px);outline:1px dashed var(--ink-2)}
+.bm-el{border-style:solid;border-color:var(--c-border);background:var(--c-padding);overflow:hidden}
+.bm-content{width:100%;height:100%;background:var(--c-content);display:grid;place-items:center;font-family:var(--f-mono);font-size:12px;color:var(--ink);overflow:hidden;text-align:center;line-height:1.3}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:13px;margin-top:14px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
+
+.dg{font-family:var(--f-mono);font-size:12px;text-align:center}
+.dg .layer{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;position:relative;border:1px dashed color-mix(in srgb,var(--ink) 35%,transparent);padding:2px}
+.dg .layer > .n{position:absolute;top:3px;left:6px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink)}
+.dg .t,.dg .b{grid-column:1/-1;padding:3px 0}
+.dg .l,.dg .r{display:grid;place-items:center;padding:0 10px}
+.dg .mid{grid-column:2}
+.dg .m{background:var(--c-margin)} .dg .bo{background:var(--c-border);border-style:solid} .dg .pa{background:var(--c-padding)}
+.dg .co{background:var(--c-content);padding:12px 8px;border:1px solid color-mix(in srgb,var(--ink) 35%,transparent);font-weight:600}
+.math{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.math .k{padding:3px 7px;border-radius:4px;color:var(--ink)}
+.math .eq{font-weight:600;font-size:15px;padding:3px 8px;border-radius:4px;background:var(--ink);color:var(--paper)}
+.math-row{display:flex;flex-direction:column;gap:6px}
+
+/* FLEX & GRID stage */
+.axis-wrap{position:relative;padding:26px 0 0 26px}
+.axis{position:absolute;font-family:var(--f-mono);font-size:11px;color:var(--accent);font-weight:600;white-space:nowrap}
+.axis.h{top:4px;left:26px;right:0;display:flex;align-items:center;gap:6px}
+.axis.h::after{content:"";flex:1;border-top:2px solid var(--accent)}
+.axis.v{left:0;top:26px;bottom:0;width:22px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.axis.v .txt{writing-mode:vertical-rl;transform:rotate(180deg)}
+.axis.v::after{content:"";flex:1;border-left:2px solid var(--accent)}
+.axis.flip.h{flex-direction:row-reverse} .axis.flip.v{flex-direction:column-reverse}
+.axis .tag{font-size:10px;padding:1px 5px;border-radius:3px;background:var(--accent);color:var(--accent-ink)}
+.fx,.gd{border:2px solid var(--ink);border-radius:6px;padding:12px;background:color-mix(in srgb,var(--sheet) 82%,transparent);position:relative}
+.fx{height:320px;overflow:auto}
+.gd{min-height:340px}
+.it{border:2px solid var(--accent);background:var(--accent-soft);border-radius:6px;padding:10px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;min-width:0;position:relative;z-index:1}
+.it b{font-family:var(--f-display);font-weight:800;line-height:1}
+.it small{font-family:var(--f-mono);font-size:10px;color:var(--ink-2);white-space:nowrap}
+.it[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.it[aria-pressed="true"] small{color:inherit;opacity:.8}
+.gd .it b{font-size:22px}
+.gline{position:absolute;pointer-events:none;z-index:2}
+.gline.c{border-left:1.5px dashed var(--warn);width:0}
+.gline.r{border-top:1.5px dashed var(--warn);height:0}
+.gnum{position:absolute;font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--warn);pointer-events:none;transform:translate(-50%,0)}
+.gnum.rn{transform:translate(0,-50%)}
+
+/* definitions */
+.def{margin:0;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.ctl .def{border-left:2px solid var(--line);padding-left:8px}
+.gloss{margin-top:20px}
+.gloss-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:8px;margin-bottom:12px}
+.gloss-head h3{font-size:20px;font-weight:700}
+.gloss-head p{margin:0;color:var(--ink-2);font-size:14px}
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px}
+.term{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.term-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.term h4{margin:0;font-family:var(--f-mono);font-size:14px;font-weight:600;color:var(--accent)}
+.term .scope{font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--paper);color:var(--ink-2)}
+.term p{margin:0;font-size:14px}
+.term .dflt{font-size:12.5px;color:var(--ink-2)}
+.term .dflt code{background:var(--paper);padding:1px 5px;border-radius:4px;color:var(--ink)}
+.term dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:13px;border-top:1px dashed var(--line);padding-top:8px}
+.term dt{font-family:var(--f-mono);font-size:12px;font-weight:600;white-space:nowrap}
+.term dd{margin:0;color:var(--ink-2)}
+.term pre{margin:0;background:var(--code-bg);color:var(--code-val);font-family:var(--f-mono);font-size:12px;padding:8px 10px;border-radius:6px;overflow-x:auto}
+@media (max-width: 900px){
+  .work{grid-template-columns:minmax(0,1fr)}
+  .intro{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width: 680px){ .duo{grid-template-columns:minmax(0,1fr)} }
+@media (prefers-reduced-motion: no-preference){
+  .bm-el,.bm-margin,.it,.fx,.gd{transition:all .18s ease}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Layout Lab</h1>
+      <p>A hands-on CSS workbook. Change a property, watch the layout move, read what happened, copy the CSS.</p>
+    </div>
+    <nav class="tabs" aria-label="Lessons">
+      <a class="tab" href="#box" data-tab="box"><small>L1</small><b>Box Model</b></a>
+      <a class="tab" href="#flex" data-tab="flex"><small>L2</small><b>Flexbox</b></a>
+      <a class="tab" href="#grid" data-tab="grid"><small>L3</small><b>Grid</b></a>
+    </nav>
+  </header>
+
+  <!-- ============ BOX MODEL ============ -->
+  <section id="v-box" data-view="box">
+    <div class="intro">
+      <div>
+        <h2>Lesson 1 · The Box Model</h2>
+        <p>Every element on a page is a rectangle made of four layers. From the inside out: <b>content</b>, <b>padding</b>, <b>border</b> and <b>margin</b>. The ruler on the stage measures real pixels, so you can check the maths yourself.</p>
+      </div>
+      <div class="key"><div class="lbl">Key idea</div><p>By default, <code>width</code> only measures the content. Padding and border are added on top. <code>box-sizing: border-box</code> changes that.</p></div>
+    </div>
+    <div class="work" style="margin-top:16px">
+      <div class="panel">
+        <div class="panel-head"><h3>Properties</h3><button class="ghost" data-reset="box">Reset</button></div>
+        <div class="ctl"><span class="cname">box-sizing</span><div class="chips" data-model="box.sizing" data-opts="content-box,border-box"></div></div>
+        <div class="ctl"><label for="box-w">width <output data-out="box.w"></output></label><input id="box-w" type="range" min="40" max="400" data-model="box.w"></div>
+        <div class="ctl"><label for="box-h">height <output data-out="box.h"></output></label><input id="box-h" type="range" min="30" max="260" data-model="box.h"></div>
+        <div class="ctl"><label for="box-p">padding <output data-out="box.p"></output></label><input id="box-p" type="range" min="0" max="60" data-model="box.p"></div>
+        <div class="ctl"><label for="box-b">border-width <output data-out="box.b"></output></label><input id="box-b" type="range" min="0" max="24" data-model="box.b"></div>
+        <div class="ctl"><label for="box-m">margin <output data-out="box.m"></output></label><input id="box-m" type="range" min="0" max="60" data-model="box.m"></div>
+        <hr class="divider">
+        <div class="lbl">Computed layers</div>
+        <div class="dg" id="bm-diagram"></div>
+      </div>
+      <div class="right">
+        <div class="stage">
+          <span class="stage-label">1 grid square = 10px</span>
+          <div class="bm-inner">
+            <div class="ruler" id="bm-ruler"></div>
+            <div class="bm-margin" id="bm-margin"><div class="bm-el" id="bm-el"><div class="bm-content" id="bm-content"></div></div></div>
+          </div>
+          <div class="legend">
+            <span><i style="background:var(--c-content)"></i>content</span>
+            <span><i style="background:var(--c-padding)"></i>padding</span>
+            <span><i style="background:var(--c-border)"></i>border</span>
+            <span><i style="background:var(--c-margin)"></i>margin (transparent in real life)</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="lbl">The maths</div>
+          <div class="math-row" id="bm-math"></div>
+        </div>
+        <div class="duo">
+          <div class="panel explain"><div class="lbl">What just happened</div><p data-explain="box"></p></div>
+          <div class="codebox"><div class="bar"><span class="lbl">Your CSS</span><button class="copy" data-copy="box">Copy</button></div><pre class="css" data-code="box"></pre></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Try it yourself</h3><span class="score" data-score="box"></span></div>
+          <ul class="tasks" data-tasks="box"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="gloss"><div class="gloss-head"><h3>Box Model property reference</h3><p>Every property in this lesson, its default value, and what each value does.</p></div><div class="gloss-grid" data-gloss="box"></div></div>
+  </section>
+
+  <!-- ============ FLEXBOX ============ -->
+  <section id="v-flex" data-view="flex" hidden>
+    <div class="intro">
+      <div>
+        <h2>Lesson 2 · Flexbox</h2>
+        <p>Flexbox lays items out in <b>one direction at a time</b>. The direction you choose is the <b>main axis</b>; the one across it is the <b>cross axis</b>. Container properties arrange all items. Item properties change one item. Click an item to select it.</p>
+      </div>
+      <div class="key"><div class="lbl">Key idea</div><p><code>justify-content</code> works on the main axis. <code>align-items</code> works on the cross axis. Change <code>flex-direction</code> and watch them swap.</p></div>
+    </div>
+    <div class="work" style="margin-top:16px">
+      <div class="panel">
+        <div class="panel-head"><h3>Container</h3><button class="ghost" data-reset="flex">Reset</button></div>
+        <div class="ctl"><span class="cname">flex-direction</span><div class="chips" data-model="flex.dir" data-opts="row,row-reverse,column,column-reverse"></div></div>
+        <div class="ctl"><span class="cname">justify-content</span><div class="chips" data-model="flex.jc" data-opts="flex-start,center,flex-end,space-between,space-around,space-evenly"></div></div>
+        <div class="ctl"><span class="cname">align-items</span><div class="chips" data-model="flex.ai" data-opts="stretch,flex-start,center,flex-end,baseline"></div></div>
+        <div class="ctl"><span class="cname">flex-wrap</span><div class="chips" data-model="flex.wrap" data-opts="nowrap,wrap,wrap-reverse"></div></div>
+        <div class="ctl"><span class="cname">align-content</span><div class="chips" data-model="flex.ac" data-opts="normal,flex-start,center,flex-end,space-between,stretch"></div></div>
+        <div class="ctl"><label for="flex-gap">gap <output data-out="flex.gap"></output></label><input id="flex-gap" type="range" min="0" max="40" data-model="flex.gap"></div>
+        <div class="ctl"><label for="flex-count">number of items <output data-out="flex.count" data-unit=""></output></label><input id="flex-count" type="range" min="1" max="12" data-model="flex.count"></div>
+        <label class="check"><input type="checkbox" id="flex-varied" data-model="flex.varied"> Different item sizes</label>
+        <hr class="divider">
+        <div class="panel-head"><h3 data-selname="flex">Item 1</h3></div>
+        <p class="sel-note">Click any item on the stage to edit it.</p>
+        <div class="ctl"><label for="fi-grow">flex-grow <output data-out="flex.item.grow" data-unit=""></output></label><input id="fi-grow" type="range" min="0" max="5" data-model="flex.item.grow"></div>
+        <div class="ctl"><label for="fi-shrink">flex-shrink <output data-out="flex.item.shrink" data-unit=""></output></label><input id="fi-shrink" type="range" min="0" max="5" data-model="flex.item.shrink"></div>
+        <div class="ctl"><span class="cname">flex-basis</span><div class="chips" data-model="flex.item.basis" data-opts="auto,0,80px,150px,250px,50%"></div></div>
+        <div class="ctl"><span class="cname">align-self</span><div class="chips" data-model="flex.item.as" data-opts="auto,flex-start,center,flex-end,stretch"></div></div>
+        <div class="ctl"><label for="fi-order">order <output data-out="flex.item.order" data-unit=""></output></label><input id="fi-order" type="range" min="-3" max="3" data-model="flex.item.order"></div>
+      </div>
+      <div class="right">
+        <div class="stage">
+          <div class="axis-wrap">
+            <div class="axis h" id="ax-h"></div>
+            <div class="axis v" id="ax-v"></div>
+            <div class="fx" id="fx"></div>
+          </div>
+        </div>
+        <div class="duo">
+          <div class="panel explain"><div class="lbl">What just happened</div><p data-explain="flex"></p></div>
+          <div class="codebox"><div class="bar"><span class="lbl">Your CSS</span><button class="copy" data-copy="flex">Copy</button></div><pre class="css" data-code="flex"></pre></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Try it yourself</h3><span class="score" data-score="flex"></span></div>
+          <ul class="tasks" data-tasks="flex"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="gloss"><div class="gloss-head"><h3>Flexbox property reference</h3><p>Every property in this lesson, its default value, and what each value does.</p></div><div class="gloss-grid" data-gloss="flex"></div></div>
+  </section>
+
+  <!-- ============ GRID ============ -->
+  <section id="v-grid" data-view="grid" hidden>
+    <div class="intro">
+      <div>
+        <h2>Lesson 3 · CSS Grid</h2>
+        <p>Grid lays items out in <b>two directions at once</b>: columns and rows. You define the tracks, and items drop into the cells. The red dashed lines are <b>grid lines</b>; their numbers are what you use with <code>grid-column</code> and <code>grid-row</code>.</p>
+      </div>
+      <div class="key"><div class="lbl">Key idea</div><p><code>1fr</code> means one share of the free space. <code>repeat(3, 1fr)</code> makes three equal columns that resize with the container.</p></div>
+    </div>
+    <div class="work" style="margin-top:16px">
+      <div class="panel">
+        <div class="panel-head"><h3>Container</h3><button class="ghost" data-reset="grid">Reset</button></div>
+        <div class="ctl"><label for="grid-cols">grid-template-columns</label><input id="grid-cols" type="text" spellcheck="false" data-model="grid.cols" data-kind="text"><div class="err" data-err="grid.cols"></div>
+          <div class="chips" data-preset="grid.cols" data-opts="repeat(3, 1fr)|1fr 2fr 1fr|150px 1fr|100px 100px 100px|repeat(auto-fill, minmax(90px, 1fr))"></div></div>
+        <div class="ctl"><label for="grid-rows">grid-template-rows</label><input id="grid-rows" type="text" spellcheck="false" data-model="grid.rows" data-kind="text"><div class="err" data-err="grid.rows"></div>
+          <div class="chips" data-preset="grid.rows" data-opts="none|80px 80px|repeat(2, 1fr)|60px 1fr 60px"></div></div>
+        <div class="ctl"><label for="grid-gap">gap <output data-out="grid.gap"></output></label><input id="grid-gap" type="range" min="0" max="40" data-model="grid.gap"></div>
+        <div class="ctl"><span class="cname">grid-auto-flow</span><div class="chips" data-model="grid.flow" data-opts="row,column,row dense"></div></div>
+        <div class="ctl"><span class="cname">justify-items</span><div class="chips" data-model="grid.ji" data-opts="stretch,start,center,end"></div></div>
+        <div class="ctl"><span class="cname">align-items</span><div class="chips" data-model="grid.ai" data-opts="stretch,start,center,end"></div></div>
+        <div class="ctl"><span class="cname">justify-content</span><div class="chips" data-model="grid.jc" data-opts="stretch,start,center,end,space-between,space-evenly"></div></div>
+        <div class="ctl"><span class="cname">align-content</span><div class="chips" data-model="grid.ac" data-opts="stretch,start,center,end,space-between,space-evenly"></div></div>
+        <div class="ctl"><label for="grid-count">number of items <output data-out="grid.count" data-unit=""></output></label><input id="grid-count" type="range" min="1" max="12" data-model="grid.count"></div>
+        <label class="check"><input type="checkbox" id="grid-lines" data-model="grid.lines"> Show grid line numbers</label>
+        <hr class="divider">
+        <div class="panel-head"><h3 data-selname="grid">Item 1</h3></div>
+        <p class="sel-note">Click any item on the stage to edit it.</p>
+        <div class="ctl"><label for="gi-cs">grid-column: span <output data-out="grid.item.cs" data-unit=""></output></label><input id="gi-cs" type="range" min="1" max="4" data-model="grid.item.cs"></div>
+        <div class="ctl"><label for="gi-rs">grid-row: span <output data-out="grid.item.rs" data-unit=""></output></label><input id="gi-rs" type="range" min="1" max="3" data-model="grid.item.rs"></div>
+        <div class="ctl"><span class="cname">justify-self</span><div class="chips" data-model="grid.item.js" data-opts="auto,start,center,end,stretch"></div></div>
+        <div class="ctl"><span class="cname">align-self</span><div class="chips" data-model="grid.item.as" data-opts="auto,start,center,end,stretch"></div></div>
+      </div>
+      <div class="right">
+        <div class="stage">
+          <div class="axis-wrap" id="gd-wrap">
+            <div class="gd" id="gd"></div>
+          </div>
+        </div>
+        <div class="duo">
+          <div class="panel explain"><div class="lbl">What just happened</div><p data-explain="grid"></p></div>
+          <div class="codebox"><div class="bar"><span class="lbl">Your CSS</span><button class="copy" data-copy="grid">Copy</button></div><pre class="css" data-code="grid"></pre></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Try it yourself</h3><span class="score" data-score="grid"></span></div>
+          <ul class="tasks" data-tasks="grid"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="gloss"><div class="gloss-head"><h3>Grid property reference</h3><p>Every property in this lesson, its default value, and what each value does.</p></div><div class="gloss-grid" data-gloss="grid"></div></div>
+  </section>
+</div>
+
+<script>
+(function(){
+const DEF = {
+  box:{w:200,h:120,p:20,b:6,m:24,sizing:'content-box'},
+  flex:{dir:'row',wrap:'nowrap',jc:'flex-start',ai:'stretch',ac:'normal',gap:8,count:4,varied:true,sel:0},
+  grid:{cols:'repeat(3, 1fr)',rows:'none',gap:8,ji:'stretch',ai:'stretch',jc:'stretch',ac:'stretch',flow:'row',count:6,lines:true,sel:0}
+};
+const FI = ()=>({grow:0,shrink:1,basis:'auto',as:'auto',order:0});
+const GI = ()=>({cs:1,rs:1,js:'auto',as:'auto'});
+function fresh(k){const o=JSON.parse(JSON.stringify(DEF[k]));
+  if(k==='flex')o.items=Array.from({length:12},FI);
+  if(k==='grid')o.items=Array.from({length:12},GI);
+  return o;}
+let S={box:fresh('box'),flex:fresh('flex'),grid:fresh('grid')};
+try{const raw=localStorage.getItem('layoutlab-v1'); if(raw){const p=JSON.parse(raw); for(const k of ['box','flex','grid']) if(p[k]) S[k]=Object.assign(fresh(k),p[k]);}}catch(e){}
+function save(){try{localStorage.setItem('layoutlab-v1',JSON.stringify(S));}catch(e){}}
+let last={box:null,flex:null,grid:null};
+
+function ref(path){const parts=path.split('.');let o=S;for(let i=0;i<parts.length-1;i++){const k=parts[i];o=(k==='item')?o.items[o.sel]:o[k];}return[o,parts[parts.length-1]];}
+function get(p){const[o,k]=ref(p);return o[k];}
+function set(p,v){const[o,k]=ref(p);o[k]=v;last[p.split('.')[0]]=p;save();render();}
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* ---------- build controls ---------- */
+$$('.chips[data-model]').forEach(el=>{
+  el.dataset.opts.split(',').forEach(o=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=o;b.dataset.v=o;
+    b.addEventListener('click',()=>set(el.dataset.model,o));el.appendChild(b);});
+});
+$$('.chips[data-preset]').forEach(el=>{
+  el.dataset.opts.split('|').forEach(o=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=o;
+    b.addEventListener('click',()=>{set(el.dataset.preset,o);});el.appendChild(b);});
+});
+$$('input[type=range][data-model]').forEach(el=>el.addEventListener('input',()=>set(el.dataset.model,+el.value)));
+$$('input[type=checkbox][data-model]').forEach(el=>el.addEventListener('change',()=>set(el.dataset.model,el.checked)));
+$$('input[data-kind=text]').forEach(el=>el.addEventListener('input',()=>{
+  const prop=el.dataset.model==='grid.cols'?'grid-template-columns':'grid-template-rows';
+  const v=el.value.trim(); const ok=v!=='' && CSS.supports(prop,v);
+  el.setAttribute('aria-invalid',ok?'false':'true');
+  $(`[data-err="${el.dataset.model}"]`).textContent=ok?'':'Not valid CSS yet. Keep typing, or pick a preset.';
+  if(ok){const[o,k]=ref(el.dataset.model);o[k]=v;last.grid=el.dataset.model;save();render(true);}
+}));
+$$('[data-reset]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.reset;S[k]=fresh(k);last[k]=null;save();render();}));
+$$('[data-copy]').forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.copy, pre=$(`[data-code="${k}"]`), txt=pre.innerText;
+  const done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1400);};
+  try{navigator.clipboard.writeText(txt).then(done,()=>selectText(pre));}catch(e){selectText(pre);}
+}));
+function selectText(el){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);}
+
+function syncControls(skipText){
+  $$('.chips[data-model]').forEach(el=>{const v=get(el.dataset.model);$$('.chip',el).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===String(v))));});
+  $$('.chips[data-preset]').forEach(el=>{const v=get(el.dataset.preset);$$('.chip',el).forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===v)));});
+  $$('input[type=range][data-model]').forEach(el=>{el.value=get(el.dataset.model);});
+  $$('input[type=checkbox][data-model]').forEach(el=>{el.checked=!!get(el.dataset.model);});
+  if(!skipText)$$('input[data-kind=text]').forEach(el=>{el.value=get(el.dataset.model);el.setAttribute('aria-invalid','false');$(`[data-err="${el.dataset.model}"]`).textContent='';});
+  $$('output[data-out]').forEach(o=>{const u=o.dataset.unit===undefined?'px':o.dataset.unit;o.textContent=get(o.dataset.out)+u;});
+  $$('[data-selname]').forEach(h=>{h.textContent='Selected: Item '+(S[h.dataset.selname].sel+1);});
+}
+
+/* ---------- explanations ---------- */
+function boxContent(){const b=S.box;return b.sizing==='content-box'?{w:b.w,h:b.h}:{w:Math.max(0,b.w-2*b.p-2*b.b),h:Math.max(0,b.h-2*b.p-2*b.b)};}
+const EX={
+ 'box.w':v=>S.box.sizing==='content-box'
+   ?`<code>width: ${v}px</code> sets the <b>content</b> area only. Padding and border are added on top, so the visible box is ${v+2*S.box.p+2*S.box.b}px wide.`
+   :`With border-box, <code>width: ${v}px</code> is the full visible box. Padding and border are taken out of it, leaving ${boxContent().w}px for content.`,
+ 'box.h':v=>S.box.sizing==='content-box'
+   ?`<code>height: ${v}px</code> sets the content height. The visible box is ${v+2*S.box.p+2*S.box.b}px tall.`
+   :`With border-box, <code>height: ${v}px</code> includes padding and border. Content gets ${boxContent().h}px.`,
+ 'box.p':v=>`<code>padding: ${v}px</code> adds space <b>inside</b> the border, around the content. Padding shows the element's background colour.`,
+ 'box.b':v=>`<code>border: ${v}px solid</code> draws a frame around the padding. It sits between padding and margin and counts toward the box size.`,
+ 'box.m':v=>`<code>margin: ${v}px</code> adds space <b>outside</b> the border. It pushes other elements away and is always transparent.`,
+ 'box.sizing':v=>v==='content-box'
+   ?`<code>content-box</code> is the browser default: width and height measure the content only.`
+   :`<code>border-box</code>: width and height now include padding and border. Most projects set <code>* { box-sizing: border-box; }</code> because sizes become predictable.`,
+ 'flex.dir':v=>({row:'Items flow left to right. The main axis is horizontal.','row-reverse':'Items flow right to left. The main axis still runs horizontally, but starts on the right.',column:'Items stack top to bottom. The main axis is now vertical, so <code>justify-content</code> moves items up and down.','column-reverse':'Items stack bottom to top. The main axis is vertical and starts at the bottom.'})[v],
+ 'flex.jc':v=>`<code>justify-content: ${v}</code> — `+({'flex-start':'items pack at the start of the main axis.',center:'items sit together in the middle of the main axis.','flex-end':'items pack at the end of the main axis.','space-between':'first and last items touch the edges; leftover space is shared between items.','space-around':'each item gets equal space on both sides, so edge gaps are half the inner gaps.','space-evenly':'every gap, including the two edges, is the same size.'})[v],
+ 'flex.ai':v=>`<code>align-items: ${v}</code> — `+({stretch:'items stretch to fill the cross axis (they have no fixed size on that axis).','flex-start':'items line up at the start of the cross axis.',center:'items are centred on the cross axis.','flex-end':'items line up at the end of the cross axis.',baseline:'items line up by the baseline of their text. Turn on "different item sizes" to see it.'})[v],
+ 'flex.wrap':v=>({nowrap:'<code>nowrap</code>: all items stay on one line and shrink to fit if needed.',wrap:'<code>wrap</code>: items move onto a new line when they run out of room. Add more items to see it.','wrap-reverse':'<code>wrap-reverse</code>: items wrap, but new lines stack in the opposite direction.'})[v],
+ 'flex.ac':v=>`<code>align-content: ${v}</code> spaces the <b>lines</b> on the cross axis. It only has an effect when wrapping is on and there is more than one line.`+(S.flex.wrap==='nowrap'?' Right now flex-wrap is nowrap, so nothing changes.':''),
+ 'flex.gap':v=>`<code>gap: ${v}px</code> puts fixed space between items. It never adds space at the outer edges.`,
+ 'flex.count':v=>`The container now has ${v} item${v>1?'s':''}.`,
+ 'flex.varied':v=>v?'Items now have different text sizes, so alignment differences are easier to see.':'All items now have the same size.',
+ 'flex.item.grow':v=>v===0?`<code>flex-grow: 0</code> — this item does not take any leftover space.`:`<code>flex-grow: ${v}</code> — this item takes ${v} share${v>1?'s':''} of the leftover space on the main axis. Other items with grow 0 keep their size.`,
+ 'flex.item.shrink':v=>v===0?`<code>flex-shrink: 0</code> — this item refuses to shrink, even if the container is too small.`:`<code>flex-shrink: ${v}</code> — when space runs out, this item gives up space at rate ${v} compared with the others.`,
+ 'flex.item.basis':v=>v==='auto'?`<code>flex-basis: auto</code> — the starting size comes from the content.`:`<code>flex-basis: ${v}</code> — the item starts at ${v} along the main axis, before grow and shrink are applied.`,
+ 'flex.item.as':v=>v==='auto'?`<code>align-self: auto</code> — this item follows the container's align-items.`:`<code>align-self: ${v}</code> overrides align-items for this one item only.`,
+ 'flex.item.order':v=>`<code>order: ${v}</code> — items are drawn from lowest to highest order. Default is 0. The HTML order does not change, only the visual order.`,
+ 'grid.cols':v=>`<code>grid-template-columns: ${esc(v)}</code> defines one track per value. <code>fr</code> is a share of free space, <code>px</code> is fixed, and <code>repeat()</code> saves typing.`,
+ 'grid.rows':v=>v==='none'?`<code>grid-template-rows: none</code> — no explicit rows. Rows are created automatically and fit their content.`:`<code>grid-template-rows: ${esc(v)}</code> sets explicit row tracks. Extra items create automatic (implicit) rows.`,
+ 'grid.gap':v=>`<code>gap: ${v}px</code> sets the size of the gutters between tracks. The grid lines sit inside the gutters.`,
+ 'grid.flow':v=>({row:'<code>grid-auto-flow: row</code> — items fill the grid row by row (the default).',column:'<code>grid-auto-flow: column</code> — items fill column by column, and new columns are added as needed.','row dense':'<code>row dense</code> — row by row, but later items back-fill holes left by spanning items. Make an item span 2 or 3 columns to see it.'})[v],
+ 'grid.ji':v=>`<code>justify-items: ${v}</code> aligns every item <b>horizontally inside its own cell</b>.`,
+ 'grid.ai':v=>`<code>align-items: ${v}</code> aligns every item <b>vertically inside its own cell</b>.`,
+ 'grid.jc':v=>`<code>justify-content: ${v}</code> moves the whole set of columns inside the container. You only see it when the columns don't fill the width, so try the <code>100px 100px 100px</code> preset.`,
+ 'grid.ac':v=>`<code>align-content: ${v}</code> moves the whole set of rows inside the container. You see it when the rows don't fill the height, for example with <code>80px 80px</code> rows.`,
+ 'grid.count':v=>`The grid now has ${v} item${v>1?'s':''}.`,
+ 'grid.lines':v=>v?'Grid line numbers are on. Column lines run along the top, row lines down the left.':'Grid line numbers are hidden.',
+ 'grid.item.cs':v=>`<code>grid-column: span ${v}</code> — this item covers ${v} column track${v>1?'s':''}.`,
+ 'grid.item.rs':v=>`<code>grid-row: span ${v}</code> — this item covers ${v} row track${v>1?'s':''}.`,
+ 'grid.item.js':v=>v==='auto'?'<code>justify-self: auto</code> — follows justify-items.':`<code>justify-self: ${v}</code> overrides justify-items for this item only.`,
+ 'grid.item.as':v=>v==='auto'?'<code>align-self: auto</code> — follows align-items.':`<code>align-self: ${v}</code> overrides align-items for this item only.`
+};
+const EX0={box:'Move any slider. This panel explains what that property does to the box.',flex:'Click a chip or move a slider. This panel explains what changed and why.',grid:'Pick a preset or type your own track sizes. This panel explains each change.'};
+
+/* ---------- code highlighting ---------- */
+function codeHTML(blocks){
+  return blocks.map(([sel,rows])=>`<span class="ln"><span class="s">${sel} {</span></span>`+
+    rows.map(([p,v,ch])=>`<span class="ln${ch?' hl':''}">  <span class="p">${p}</span>: <span class="v">${esc(v)}</span>;</span>`).join('')+
+    `<span class="ln"><span class="s">}</span></span>`).join('<span class="ln"> </span>');
+}
+
+/* ---------- tasks ---------- */
+const TASKS={
+ box:[
+  ['Make the total width (margin edge to margin edge) exactly 300px.',()=>{const b=S.box,c=boxContent();return 2*b.m+2*b.b+2*b.p+c.w===300;}],
+  ['Switch to border-box, set padding to 30px, and keep the visible box 200px wide.',()=>S.box.sizing==='border-box'&&S.box.p===30&&S.box.w===200],
+  ['Remove all space outside the border.',()=>S.box.m===0],
+  ['Make the content area exactly 100px wide using content-box.',()=>S.box.sizing==='content-box'&&S.box.w===100]
+ ],
+ flex:[
+  ['Centre the items on both axes.',()=>S.flex.jc==='center'&&S.flex.ai==='center'],
+  ['Stack the items vertically, top to bottom.',()=>S.flex.dir==='column'],
+  ['Push the first and last items to the edges with equal space between the rest.',()=>S.flex.jc==='space-between'],
+  ['Let Item 1 fill all the leftover space while the others keep their size.',()=>{const it=S.flex.items.slice(0,S.flex.count);return S.flex.count>1&&it[0].grow>=1&&it.slice(1).every(x=>x.grow===0);}],
+  ['Move the last item to the front using order only.',()=>{const it=S.flex.items.slice(0,S.flex.count),n=it.length;return n>1&&it.slice(0,n-1).every(x=>x.order>it[n-1].order);}],
+  ['Show 10 items that wrap onto more than one line.',()=>S.flex.count>=10&&S.flex.wrap!=='nowrap']
+ ],
+ grid:[
+  ['Make three equal columns.',()=>['repeat(3, 1fr)','repeat(3,1fr)','1fr 1fr 1fr'].includes(S.grid.cols.replace(/\s+/g,' ').trim().toLowerCase())],
+  ['Make Item 1 span two columns.',()=>S.grid.items[0].cs===2],
+  ['Make Item 2 span two rows.',()=>S.grid.count>1&&S.grid.items[1].rs===2],
+  ['Fill the grid column by column instead of row by row.',()=>S.grid.flow==='column'],
+  ['Centre every item inside its cell, both ways.',()=>S.grid.ji==='center'&&S.grid.ai==='center'],
+  ['Set fixed 100px columns and centre the whole grid horizontally.',()=>/100px/.test(S.grid.cols)&&!/fr|auto|minmax|%/.test(S.grid.cols)&&S.grid.jc==='center']
+ ]
+};
+function renderTasks(k){
+  const ul=$(`[data-tasks="${k}"]`);let n=0;
+  ul.innerHTML=TASKS[k].map(([t,fn])=>{const d=fn();if(d)n++;return `<li class="${d?'done':''}"><span>${t}</span><span class="pill">${d?'Done':'To do'}</span></li>`;}).join('');
+  $(`[data-score="${k}"]`).textContent=`${n} of ${TASKS[k].length} done`;
+}
+
+/* ---------- BOX ---------- */
+(function(){const r=$('#bm-ruler');let h='';for(let x=0;x<=1000;x+=50)h+=`<span style="left:${x}px">${x}</span>`;r.innerHTML=h;})();
+function renderBox(){
+  const b=S.box,c=boxContent(),el=$('#bm-el');
+  $('#bm-margin').style.padding=b.m+'px';
+  Object.assign(el.style,{boxSizing:b.sizing,width:b.w+'px',height:b.h+'px',padding:b.p+'px',borderWidth:b.b+'px'});
+  $('#bm-content').innerHTML=c.w>=60&&c.h>=26?`content<br>${c.w} × ${c.h}`:'';
+  const bw=c.w+2*b.p+2*b.b,bh=c.h+2*b.p+2*b.b,tw=bw+2*b.m,th=bh+2*b.m;
+  $('#bm-diagram').innerHTML=
+   `<div class="layer m"><span class="n">margin</span><div class="t">${b.m}</div><div class="l">${b.m}</div><div class="mid">
+     <div class="layer bo"><span class="n">border</span><div class="t">${b.b}</div><div class="l">${b.b}</div><div class="mid">
+      <div class="layer pa"><span class="n">padding</span><div class="t">${b.p}</div><div class="l">${b.p}</div><div class="mid">
+        <div class="co">${c.w} × ${c.h}</div>
+      </div><div class="r">${b.p}</div><div class="b">${b.p}</div></div>
+     </div><div class="r">${b.b}</div><div class="b">${b.b}</div></div>
+   </div><div class="r">${b.m}</div><div class="b">${b.m}</div></div>`;
+  const k=(c,v)=>`<span class="k" style="background:var(--c-${c})">${v}</span>`;
+  const note=b.sizing==='border-box'?`<div class="sel-note">border-box: content = width ${b.w} − padding ${2*b.p} − border ${2*b.b} = ${c.w}${b.w-2*b.p-2*b.b<0?' (cannot go below 0)':''}</div>`:`<div class="sel-note">content-box: content = width = ${b.w}</div>`;
+  $('#bm-math').innerHTML=
+   `<div class="lbl">Total width</div><div class="math">${k('margin',b.m)}+${k('border',b.b)}+${k('padding',b.p)}+${k('content',c.w)}+${k('padding',b.p)}+${k('border',b.b)}+${k('margin',b.m)}<span class="eq">= ${tw}px</span></div>
+    <div class="lbl" style="margin-top:6px">Total height</div><div class="math">${k('margin',b.m)}+${k('border',b.b)}+${k('padding',b.p)}+${k('content',c.h)}+${k('padding',b.p)}+${k('border',b.b)}+${k('margin',b.m)}<span class="eq">= ${th}px</span></div>
+    <div class="sel-note">Visible box (border edge to border edge): ${bw} × ${bh}px</div>${note}`;
+  const d=DEF.box;
+  $('[data-code="box"]').innerHTML=codeHTML([['.box',[
+    ['box-sizing',b.sizing,b.sizing!==d.sizing],['width',b.w+'px',b.w!==d.w],['height',b.h+'px',b.h!==d.h],
+    ['padding',b.p+'px',b.p!==d.p],['border',b.b+'px solid #eec46c',b.b!==d.b],['margin',b.m+'px',b.m!==d.m]]]]);
+}
+
+/* ---------- FLEX ---------- */
+const FS=[18,30,22,38,20,26,34,18,28,24,40,21], FP=[10,18,8,14,22,10,6,16,12,20,8,14];
+function renderFlex(){
+  const f=S.flex,fx=$('#fx');if(f.sel>=f.count)f.sel=f.count-1;
+  Object.assign(fx.style,{display:'flex',flexDirection:f.dir,flexWrap:f.wrap,justifyContent:f.jc,alignItems:f.ai,alignContent:f.ac,gap:f.gap+'px'});
+  fx.innerHTML='';
+  for(let i=0;i<f.count;i++){const it=f.items[i],b=document.createElement('button');b.type='button';b.className='it';
+    b.setAttribute('aria-pressed',String(i===f.sel));
+    const meta=[];if(it.grow)meta.push('grow '+it.grow);if(it.shrink!==1)meta.push('shrink '+it.shrink);if(it.basis!=='auto')meta.push('basis '+it.basis);if(it.order)meta.push('order '+it.order);if(it.as!=='auto')meta.push(it.as);
+    b.innerHTML=`<b>${i+1}</b><small>${meta.join(' · ')||'item'}</small>`;
+    Object.assign(b.style,{flexGrow:it.grow,flexShrink:it.shrink,flexBasis:it.basis,alignSelf:it.as,order:it.order,
+      fontSize:'', paddingBlock:''});
+    $('b',b).style.fontSize=(f.varied?FS[i]:24)+'px';
+    b.style.paddingBlock=(f.varied?FP[i]:12)+'px';
+    b.addEventListener('click',()=>{f.sel=i;save();render();});
+    fx.appendChild(b);}
+  const row=f.dir.startsWith('row'),rev=f.dir.endsWith('reverse'),wr=f.wrap==='wrap-reverse';
+  const H=$('#ax-h'),V=$('#ax-v');
+  const mainTxt='main axis',crossTxt='cross axis';
+  H.className='axis h'+((row?rev:wr)?' flip':'');V.className='axis v'+((row?wr:rev)?' flip':'');
+  H.innerHTML=`<span class="tag">${row?'MAIN':'CROSS'}</span><span>${row?mainTxt+' · justify-content':crossTxt+' · align-items'}</span>`;
+  V.innerHTML=`<span class="tag">${row?'X':'M'}</span><span class="txt">${row?crossTxt+' · align-items':mainTxt+' · justify-content'}</span>`;
+  const d=DEF.flex,rows=[['display','flex',false],['flex-direction',f.dir,f.dir!==d.dir],['flex-wrap',f.wrap,f.wrap!==d.wrap],['justify-content',f.jc,f.jc!==d.jc],['align-items',f.ai,f.ai!==d.ai]];
+  if(f.ac!=='normal')rows.push(['align-content',f.ac,true]);
+  rows.push(['gap',f.gap+'px',f.gap!==d.gap]);
+  const blocks=[['.container',rows]],D=FI();
+  for(let i=0;i<f.count;i++){const it=f.items[i],r=[];
+    if(it.grow!==D.grow)r.push(['flex-grow',it.grow,1]);if(it.shrink!==D.shrink)r.push(['flex-shrink',it.shrink,1]);
+    if(it.basis!==D.basis)r.push(['flex-basis',it.basis,1]);if(it.as!==D.as)r.push(['align-self',it.as,1]);if(it.order!==D.order)r.push(['order',it.order,1]);
+    if(r.length)blocks.push([`.item:nth-child(${i+1})`,r]);}
+  $('[data-code="flex"]').innerHTML=codeHTML(blocks);
+}
+
+/* ---------- GRID ---------- */
+function renderGrid(){
+  const g=S.grid,gd=$('#gd');if(g.sel>=g.count)g.sel=g.count-1;
+  Object.assign(gd.style,{display:'grid',gridTemplateColumns:g.cols,gridTemplateRows:g.rows,gap:g.gap+'px',gridAutoFlow:g.flow,
+    justifyItems:g.ji,alignItems:g.ai,justifyContent:g.jc,alignContent:g.ac,gridAutoRows:'minmax(56px, auto)'});
+  if(g.flow==='column')gd.style.gridAutoColumns='minmax(70px, 1fr)';else gd.style.gridAutoColumns='';
+  gd.innerHTML='';
+  for(let i=0;i<g.count;i++){const it=g.items[i],b=document.createElement('button');b.type='button';b.className='it';
+    b.setAttribute('aria-pressed',String(i===g.sel));
+    const meta=[];if(it.cs>1)meta.push('col span '+it.cs);if(it.rs>1)meta.push('row span '+it.rs);if(it.js!=='auto')meta.push('j: '+it.js);if(it.as!=='auto')meta.push('a: '+it.as);
+    b.innerHTML=`<b>${i+1}</b><small>${meta.join(' · ')||'item'}</small>`;
+    Object.assign(b.style,{gridColumn:it.cs>1?`span ${it.cs}`:'',gridRow:it.rs>1?`span ${it.rs}`:'',justifySelf:it.js,alignSelf:it.as});
+    b.addEventListener('click',()=>{g.sel=i;save();render();});
+    gd.appendChild(b);}
+  requestAnimationFrame(drawLines);
+  const d=DEF.grid,rows=[['display','grid',false],['grid-template-columns',g.cols,g.cols!==d.cols]];
+  if(g.rows!=='none')rows.push(['grid-template-rows',g.rows,true]);
+  rows.push(['gap',g.gap+'px',g.gap!==d.gap]);
+  if(g.flow!=='row')rows.push(['grid-auto-flow',g.flow,true]);
+  for(const[p,k]of[['justify-items','ji'],['align-items','ai'],['justify-content','jc'],['align-content','ac']]) if(g[k]!=='stretch')rows.push([p,g[k],true]);
+  const blocks=[['.container',rows]],D=GI();
+  for(let i=0;i<g.count;i++){const it=g.items[i],r=[];
+    if(it.cs>1)r.push(['grid-column','span '+it.cs,1]);if(it.rs>1)r.push(['grid-row','span '+it.rs,1]);
+    if(it.js!==D.js)r.push(['justify-self',it.js,1]);if(it.as!==D.as)r.push(['align-self',it.as,1]);
+    if(r.length)blocks.push([`.item:nth-child(${i+1})`,r]);}
+  $('[data-code="grid"]').innerHTML=codeHTML(blocks);
+}
+function trackPos(tracks,gap,space,mode){
+  const n=tracks.length,sum=tracks.reduce((a,b)=>a+b,0),free=Math.max(0,space-sum-gap*Math.max(0,n-1));
+  let off=0,extra=0;
+  if(mode==='center')off=free/2;else if(mode==='end')off=free;
+  else if(mode==='space-between')extra=n>1?free/(n-1):0;
+  else if(mode==='space-around'){extra=free/n;off=extra/2;}
+  else if(mode==='space-evenly'){extra=free/(n+1);off=extra;}
+  const lines=[];let x=off;
+  for(let i=0;i<n;i++){lines.push(i===0?x:x-(gap+extra)/2);x+=tracks[i]+gap+extra;}
+  lines.push(x-gap-extra);return lines;
+}
+function drawLines(){
+  const wrap=$('#gd-wrap'),gd=$('#gd');$$('.gline,.gnum',wrap).forEach(e=>e.remove());
+  if(!S.grid.lines||wrap.offsetParent===null)return;
+  const cs=getComputedStyle(gd);
+  const cols=cs.gridTemplateColumns.split(' ').map(parseFloat).filter(x=>!isNaN(x)),rows=cs.gridTemplateRows.split(' ').map(parseFloat).filter(x=>!isNaN(x));
+  if(!cols.length)return;
+  const pl=parseFloat(cs.paddingLeft),pt=parseFloat(cs.paddingTop),bl=parseFloat(cs.borderLeftWidth),bt=parseFloat(cs.borderTopWidth);
+  const cw=gd.clientWidth-pl-parseFloat(cs.paddingRight),ch=gd.clientHeight-pt-parseFloat(cs.paddingBottom);
+  const ox=gd.offsetLeft+bl+pl,oy=gd.offsetTop+bt+pt;
+  const cg=parseFloat(cs.columnGap)||0,rg=parseFloat(cs.rowGap)||0;
+  const cx=trackPos(cols,cg,cw,S.grid.jc),ry=rows.length?trackPos(rows,rg,ch,S.grid.ac):[];
+  const top=gd.offsetTop,h=gd.offsetHeight,left=gd.offsetLeft,w=gd.offsetWidth;
+  const frag=document.createDocumentFragment(),mk=(c,st,t)=>{const e=document.createElement('div');e.className=c;Object.assign(e.style,st);if(t!==undefined)e.textContent=t;frag.appendChild(e);};
+  cx.forEach((x,i)=>{mk('gline c',{left:ox+x+'px',top:top+'px',height:h+'px'});mk('gnum',{left:ox+x+'px',top:'6px'},i+1);});
+  ry.forEach((y,i)=>{mk('gline r',{top:oy+y+'px',left:left+'px',width:w+'px'});mk('gnum rn',{top:oy+y+'px',left:'6px'},i+1);});
+  wrap.appendChild(frag);
+}
+window.addEventListener('resize',()=>requestAnimationFrame(drawLines));
+
+/* ---------- definitions ---------- */
+// [lesson, property, model key or null, scope, short definition, default, [[value, meaning]], example]
+const DEFS=[
+ ['box','content',null,'concept','The innermost area of the box, where text, images and child elements appear. Its size is set by width and height (in content-box mode).','—',[],''],
+ ['box','padding','box.p','any element','Space between the content and the border. It is inside the element, so it shows the element\'s background colour. It cannot be negative.','0',[['10px','10px on all four sides'],['10px 20px','10px top/bottom, 20px left/right'],['5px 10px 15px 20px','top, right, bottom, left (clockwise)']],'padding: 20px;'],
+ ['box','border','box.b','any element','A line drawn around the padding. Written as width, style and colour. The border width adds to the size of the box.','none (0)',[['2px solid #333','2px wide, solid line'],['1px dashed red','dashed line'],['border-radius','rounds the corners (a separate property)']],'border: 6px solid #eec46c;'],
+ ['box','margin','box.m','any element','Space outside the border that pushes other elements away. It is always transparent. Vertical margins of block elements can collapse into one. Can be negative.','0',[['20px','20px on all four sides'],['0 auto','centres a block element that has a width'],['-10px','pulls the element 10px over its neighbour']],'margin: 24px;'],
+ ['box','width','box.w','block & replaced elements','Sets the horizontal size of the box. In content-box mode it measures the content only. In border-box mode it measures content + padding + border.','auto (fill the available width for blocks)',[['200px','fixed size'],['50%','half of the parent\'s width'],['auto','browser decides']],'width: 200px;'],
+ ['box','height','box.h','block & replaced elements','Sets the vertical size of the box. Most of the time it is better to let content decide the height (auto) so text never overflows.','auto (fit the content)',[['120px','fixed size'],['100vh','full height of the screen'],['auto','grows with the content']],'height: 120px;'],
+ ['box','box-sizing','box.sizing','any element','Decides what width and height measure. This is the switch that changes the whole box model maths.','content-box',[['content-box','width/height = content only; padding and border are added'],['border-box','width/height = content + padding + border']],'* { box-sizing: border-box; }'],
+ ['flex','display: flex',null,'container','Turns an element into a flex container. Its direct children become flex items and are laid out along one axis.','display: block',[['flex','block-level flex container'],['inline-flex','flex container that sits inline with text']],'.container { display: flex; }'],
+ ['flex','main axis / cross axis',null,'concept','The main axis is the direction items flow (set by flex-direction). The cross axis runs at 90° to it. justify-* properties work on the main axis, align-* properties on the cross axis.','main axis = horizontal',[],''],
+ ['flex','flex-direction','flex.dir','container','Sets the direction of the main axis, so it decides whether items sit in a row or a column.','row',[['row','left → right'],['row-reverse','right → left'],['column','top → bottom'],['column-reverse','bottom → top']],'flex-direction: column;'],
+ ['flex','justify-content','flex.jc','container','Distributes items and the free space between them along the main axis.','flex-start',[['flex-start','pack at the start'],['center','pack in the middle'],['flex-end','pack at the end'],['space-between','no space at edges, equal space between'],['space-around','equal space around each item'],['space-evenly','equal space everywhere, edges included']],'justify-content: center;'],
+ ['flex','align-items','flex.ai','container','Aligns items on the cross axis, within their line.','stretch',[['stretch','fill the cross axis'],['flex-start','line up at the cross start'],['center','centre on the cross axis'],['flex-end','line up at the cross end'],['baseline','line up the text baselines']],'align-items: center;'],
+ ['flex','flex-wrap','flex.wrap','container','Decides whether items must stay on one line or may wrap onto several lines.','nowrap',[['nowrap','one line; items shrink'],['wrap','extra lines below'],['wrap-reverse','extra lines above']],'flex-wrap: wrap;'],
+ ['flex','align-content','flex.ac','container','Distributes the lines (not the items) on the cross axis. Only works when flex-wrap allows several lines.','normal (acts like stretch)',[['flex-start / center / flex-end','pack the lines together'],['space-between','space between the lines'],['stretch','lines grow to fill']],'align-content: space-between;'],
+ ['flex','gap','flex.gap','container','Fixed space between neighbouring items (and between lines). It never adds space on the outside edges.','0',[['10px','10px between items'],['10px 20px','row gap, then column gap']],'gap: 8px;'],
+ ['flex','flex-grow','flex.item.grow','item','How much of the leftover main-axis space the item takes, compared with the others. 0 means it does not grow.','0',[['0','do not grow'],['1','take one share of the free space'],['2','take twice as much as a grow-1 item']],'flex-grow: 1;'],
+ ['flex','flex-shrink','flex.item.shrink','item','How much the item shrinks, compared with the others, when there is not enough space. 0 means it never shrinks.','1',[['1','shrink normally'],['0','never shrink (may overflow)']],'flex-shrink: 0;'],
+ ['flex','flex-basis','flex.item.basis','item','The starting size of the item on the main axis, before grow and shrink are applied.','auto',[['auto','use width/height or content size'],['0','start from zero, share all space by grow'],['150px / 50%','start at that size']],'flex-basis: 150px;'],
+ ['flex','flex (shorthand)',null,'item','A shortcut for grow, shrink and basis in one line. Used in real projects more than the three long-hand properties.','0 1 auto',[['flex: 1','1 1 0 — share space equally'],['flex: none','0 0 auto — fixed size'],['flex: 0 0 200px','exactly 200px, never grow or shrink']],'flex: 1;'],
+ ['flex','align-self','flex.item.as','item','Overrides align-items for this one item.','auto (use align-items)',[['auto','follow the container'],['flex-start / center / flex-end / stretch','same meanings as align-items']],'align-self: flex-end;'],
+ ['flex','order','flex.item.order','item','Changes the visual order. Items are placed from the lowest order to the highest. The HTML order (and screen-reader order) stays the same.','0',[['-1','move before default items'],['1','move after default items']],'order: -1;'],
+ ['grid','display: grid',null,'container','Turns an element into a grid container. Its direct children become grid items placed into rows and columns.','display: block',[['grid','block-level grid'],['inline-grid','grid that sits inline with text']],'.container { display: grid; }'],
+ ['grid','track, cell, line, area',null,'concept','A track is one row or column. A cell is where one row and one column meet. Lines are the numbered edges between tracks (they start at 1). An area is any rectangle of cells.','—',[],''],
+ ['grid','fr unit',null,'concept','A fraction of the free space left in the grid after fixed sizes and gaps are taken out.','—',[['1fr 1fr','two equal columns'],['1fr 2fr','second column twice as wide'],['200px 1fr','fixed sidebar, flexible main']],'grid-template-columns: 1fr 2fr;'],
+ ['grid','repeat() and minmax()',null,'concept','repeat(n, size) writes the same track n times. minmax(min, max) lets a track grow between two sizes. Together with auto-fill they make responsive grids with no media queries.','—',[['repeat(3, 1fr)','three equal columns'],['minmax(100px, 1fr)','at least 100px, grow to fill'],['repeat(auto-fill, minmax(100px, 1fr))','as many 100px+ columns as fit']],'grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));'],
+ ['grid','grid-template-columns','grid.cols','container','Defines the columns: one size per column track.','none (one column)',[['200px 1fr','fixed + flexible'],['repeat(4, 1fr)','four equal columns'],['auto 1fr auto','sides fit content, middle fills']],'grid-template-columns: repeat(3, 1fr);'],
+ ['grid','grid-template-rows','grid.rows','container','Defines explicit rows. Items beyond these rows create implicit rows, sized by grid-auto-rows.','none (rows sized automatically)',[['80px 80px','two 80px rows'],['60px 1fr 60px','header, body, footer'],['none','all rows automatic']],'grid-template-rows: 60px 1fr 60px;'],
+ ['grid','gap','grid.gap','container','The size of the gutters between rows and columns. Also written row-gap and column-gap.','0',[['16px','16px gutters both ways'],['10px 20px','row gap, column gap']],'gap: 16px;'],
+ ['grid','grid-auto-flow','grid.flow','container','Controls how items without a set position are placed automatically.','row',[['row','fill row by row'],['column','fill column by column'],['dense','back-fill earlier holes']],'grid-auto-flow: row dense;'],
+ ['grid','justify-items','grid.ji','container','Aligns every item horizontally (inline axis) inside its own cell.','stretch',[['stretch','fill the cell width'],['start / center / end','sit left / middle / right of the cell']],'justify-items: center;'],
+ ['grid','align-items','grid.ai','container','Aligns every item vertically (block axis) inside its own cell.','stretch',[['stretch','fill the cell height'],['start / center / end','sit top / middle / bottom of the cell']],'align-items: center;'],
+ ['grid','justify-content','grid.jc','container','Moves the whole grid of columns inside the container when the columns are narrower than the container.','normal (acts like start/stretch)',[['start / center / end','place the column set'],['space-between / space-evenly','spread the columns out']],'justify-content: center;'],
+ ['grid','align-content','grid.ac','container','Moves the whole grid of rows inside the container when the rows are shorter than the container.','normal (acts like stretch)',[['start / center / end','place the row set'],['space-between / space-evenly','spread the rows out']],'align-content: start;'],
+ ['grid','grid-column','grid.item.cs','item','Sets where an item starts and ends across columns, using line numbers or span.','auto',[['span 2','cover two columns'],['1 / 3','from line 1 to line 3'],['1 / -1','full width, first line to last']],'grid-column: span 2;'],
+ ['grid','grid-row','grid.item.rs','item','Sets where an item starts and ends across rows.','auto',[['span 2','cover two rows'],['2 / 4','from row line 2 to 4']],'grid-row: span 2;'],
+ ['grid','justify-self','grid.item.js','item','Overrides justify-items for one item: horizontal position inside its cell.','auto',[['start / center / end / stretch','same as justify-items']],'justify-self: end;'],
+ ['grid','align-self','grid.item.as','item','Overrides align-items for one item: vertical position inside its cell.','auto',[['start / center / end / stretch','same as align-items']],'align-self: center;']
+];
+(function placeDefs(){
+  DEFS.forEach(([lesson,prop,model,scope,def])=>{
+    if(!model)return;
+    const ctlEl=$(`[data-model="${model}"]`); if(!ctlEl)return;
+    const ctl=ctlEl.closest('.ctl'); if(!ctl)return;
+    const p=document.createElement('p');p.className='def';p.innerHTML=esc(def);
+    const anchor=$('.chips[data-preset]',ctl)||$('.err',ctl);
+    if(anchor&&anchor.classList.contains('err'))anchor.after(p); else ctl.insertBefore(p, ctl.children[1]);
+  });
+  // value meanings as hover tooltips on chips
+  const vmap={};DEFS.forEach(d=>{if(d[2])vmap[d[2]]=Object.fromEntries(d[6].map(([v,m])=>[v,m]));});
+  $$('.chips[data-model]').forEach(el=>{const m=vmap[el.dataset.model]||{};$$('.chip',el).forEach(b=>{if(m[b.dataset.v])b.title=m[b.dataset.v];});});
+  for(const k of ['box','flex','grid']){
+    $(`[data-gloss="${k}"]`).innerHTML=DEFS.filter(d=>d[0]===k).map(([,prop,,scope,def,dflt,vals,ex])=>
+      `<article class="term"><div class="term-top"><h4>${esc(prop)}</h4><span class="scope">${scope}</span></div>
+       <p>${esc(def)}</p>
+       ${dflt!=='—'?`<div class="dflt">Default: <code>${esc(dflt)}</code></div>`:''}
+       ${vals.length?`<dl>${vals.map(([v,m])=>`<dt>${esc(v)}</dt><dd>${esc(m)}</dd>`).join('')}</dl>`:''}
+       ${ex?`<pre>${esc(ex)}</pre>`:''}</article>`).join('');
+  }
+})();
+
+/* ---------- routing + render ---------- */
+let view='box';
+function route(){const h=location.hash.replace('#','');view=['box','flex','grid'].includes(h)?h:'box';
+  $$('[data-view]').forEach(s=>s.hidden=s.dataset.view!==view);
+  $$('.tab').forEach(t=>t.setAttribute('aria-current',t.dataset.tab===view?'page':'false'));
+  requestAnimationFrame(drawLines);}
+window.addEventListener('hashchange',route);
+
+function render(skipText){
+  renderBox();renderFlex();renderGrid();
+  for(const k of ['box','flex','grid']){
+    const p=last[k],el=$(`[data-explain="${k}"]`);
+    el.innerHTML=p&&EX[p]?EX[p](get(p)):EX0[k];
+    renderTasks(k);
+  }
+  syncControls(skipText);
+}
+route();render();
+})();
+</script>
+
+</body></html>
